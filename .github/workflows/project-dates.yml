@@ -1,31 +1,32 @@
-name: Update start date when issue is moved to In Progress
+name: Update dates when issue is moved to In Progress or Done
 
 on:
   workflow_dispatch:
-  project_v2_item:
+  project_card:
     types: [moved]
 
 jobs:
-  update_start_date:
-    if: github.event.project_v2_item.field_changes | contains('status') && github.event.project_v2_item.content.type == 'issue'
+  update_dates:
+    if: github.event.project_card.content.type == 'Issue'
     runs-on: ubuntu-latest
     steps:
       - name: Get issue details
         id: get_issue
         run: |
-          ISSUE_ID=${{ github.event.project_v2_item.content.id }}
+          ISSUE_ID=${{ github.event.project_card.content.id }}
           ISSUE_NUMBER=$(gh issue view $ISSUE_ID --json number --jq '.number')
           echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
       - name: Update start date only if moved to In Progress
-        if: github.event.project_v2_item.previous_column_id != github.event.project_v2_item.column_id && github.event.project_v2_item.column_id == 'ID_DE_COLUMN_INPROGRESS'
+        if: github.event.project_card.previous_column_id != github.event.project_card.column_id && github.event.project_card.column_id == 'ID_DE_COLUMN_INPROGRESS'
         run: |
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"milestone\": {\"start_date\": \"$(date +'%Y-%m-%d')\"}}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }}"
+
       - name: Update end date only if moved to Done
-        if: github.event.project_v2_item.previous_column_id != github.event.project_v2_item.column_id && github.event.project_v2_item.column_id == 'ID_DE_COLUMN_DONE'
+        if: github.event.project_card.previous_column_id != github.event.project_card.column_id && github.event.project_card.column_id == 'ID_DE_COLUMN_DONE'
         run: |
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
