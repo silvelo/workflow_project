@@ -1,0 +1,28 @@
+branchName: full
+autoLinkIssue: true
+autoCloseIssue: true
+defaultBranch: "develop"
+openDraftPR: true
+copyIssueDescriptionToPR: true
+copyIssueAssigneeToPR: true
+copyIssueLabelsToPR: true
+conventionalPrTitles: true
+branches:
+  - label: refactor
+    prefix: refactor/
+    prTarget: develop
+  - label: style
+    prefix: style/
+    prTarget: develop
+  - label: bug
+    prefix: fix/
+    prTarget: develop
+  - label: documentation
+    prefix: docs/
+    prTarget: develop
+  - label: enhancement
+    prefix: feat/
+    prTarget: develop
+  - label: "*"
+    prefix: perf/
+    prTarget: develop
